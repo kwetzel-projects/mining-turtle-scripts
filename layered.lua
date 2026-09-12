@@ -1,9 +1,10 @@
-local RADIUS=32
+local RADIUS=31
 local MIN_EMPTY_SLOTS=4
 local currentX,currentZ,currentY,currentDir=0,0,0,0
-local DUMP_X,DUMP_Z,DUMP_DIR=-31,0,3
+local DUMP_X,DUMP_Z,DUMP_DIR=-30,0,3
 local DX={[0]=0,1,0,-1}
 local DZ={[0]=-1,0,1,0}
+local PATH_ORDER={3,0,2,1}
 local blocked={}
 local inDump=false
 local dumpInventory
@@ -114,7 +115,7 @@ local function findPath(tx,tz)
 
         if p[1]==tx and p[2]==tz then break end
 
-        for d=0,3 do
+        for _,d in ipairs(PATH_ORDER) do
             local nx=p[1]+DX[d]
             local nz=p[2]+DZ[d]
             local k=key(nx,nz)
@@ -352,20 +353,11 @@ local function minePass(y)
     return true
 end
 
-local completed=true
-
 for band=1,BAND_COUNT do
     local y=-(band-1)*9
 
-    if not minePass(y) then
-        completed=false
-        break
-    end
-
-    if not minePass(y-3) then
-        completed=false
-        break
-    end
+    if not minePass(y) then break end
+    if not minePass(y-3) then break end
 end
 
 local hasItems=false
